@@ -35,20 +35,50 @@
     </div>
 </nav>
 
-<div class="container-fluid">
-    {% if grade > 80 %}
+<div class="container-fluid" style='padding: 20px;'>
+    {% if question_mark > 80 %}
     <div class="alert alert-success">
        <!--HINT Display passed info -->
+        <p><b>Congratulations, {{user.first_name}}! </b>You have passed the exam and completed the course with score {{question_mark}} / 100</p>
     </div>
         {% else %}
         <div class="alert alert-danger">
             <!--HINT Display failed info -->
+            <p><b>Failed. </b>Sorry, {{user.first_name}}! You have failed the exam with score {{question_mark}} / 100</p>
         </div>
         <a class="btn btn-link text-danger" href="{% url 'onlinecourse:course_details' course.id %}">Re-test</a>
         {% endif %}
         <div class="card-columns-vertical mt-1">
         <h5 class="">Exam results</h5>
             <!--HINT Display exam results-->
+            <!--... for each question in the course ...-->
+            {% for lesson in course.lesson_set.all %}
+            {% for question in lesson.question_set.all %}
+            <div class="card mt-1">
+                <div class="card-header"><h5 style="font-weight:bold">{{ question.question_text}}</h5></div>
+                <div class="form-group">
+                <!--... for each choice in the question  choice_{{choice.id}}...-->
+                    {% for choice in question.choice_set.all %}
+                    <div class="form-check">
+                        {% if choice.id in selected_ids %}
+                            {% if choice.is_correct %}
+                                <h6 class="text-success">Correct answer: {{choice.choice_text}}</h6>
+                            {% else %}
+                                <h6 class="text-danger">Incorrect answer: {{choice.choice_text}}</h6>
+                            {% endif %}
+                        {% else %}
+                            {% if choice.is_correct %}
+                                <h6 class="text-warning">Not selected: {{choice.choice_text}}</h6>
+                            {% else %}
+                                <h6>{{choice.choice_text}}</h6>
+                            {% endif %}
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endfor %}
+            {% endfor %}
         </div>
     </div>
 </body>
